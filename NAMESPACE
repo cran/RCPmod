@@ -1,0 +1,16 @@
+export( "AIC.regimix",
+"BIC.regimix",
+"coef.regimix",
+"extractAIC.regimix",
+"logLik.regimix",
+"orderFitted",
+"plot.regimix",
+"predict.regimix",
+"regimix",
+"simRCPdata",
+"vcov.regimix")
+import( numDeriv)
+import( gtools)
+S3method( "print", "regimix")
+S3method( "summary", "regimix")
+

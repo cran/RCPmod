@@ -1,0 +1,13 @@
+AIC.regimix                                     Information criterion for a regimix model.
+BIC.regimix                                     Information criterion for a regimix model.
+coef.regimix                                    A regimix objects coefficients.
+extractAIC.regimix                              Extracts the AIC for a fitted refimix model.
+logLik.regimix                                  The log likelihood for a regimix model.
+orderFitted                                     Assesses classification error and re-orders parameters
+plot.regimix                                    Plots a regimix object.
+predict.regimix                                 Predicts from a regimix object.
+print.regimix                                   Prints a regimix object.
+regimix                                         Fits a regimix model.
+simRCPdata                                      Simulates from a regimix model
+summary.regimix                                 Summarises a regimix object.
+vcov.regimix                                    Variance matrix for a regimix object.
