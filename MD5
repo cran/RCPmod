@@ -1,4 +1,4 @@
-4381984a057fdcf68911c0f1f9354580 *DESCRIPTION
+3e288bbf0f160ffc546266b3befee27b *DESCRIPTION
 e31cc37a9798b8007b0ad86419c01a14 *INDEX
 9a71b2839ecaef8971c79bf648a5ded2 *NAMESPACE
 380b0bef12c6a4ab1cec0a92b6a61022 *R/RCPmod.R
@@ -18,7 +18,7 @@ b9b91394f701480ff535617779c9c345 *man/vcov.regimix.Rd
 9a38a662c42b7fc4808b5044453df751 *src/allClasses.cc
 25614d1c8ceebcc0457ae209ebd94402 *src/habiPred1.cc
 17236fc51bb580502c4f9feb4dd1fd66 *src/habiPred1.h
-dc429a0b258b7d45b44a30981bfd828b *src/habitat4.cc
+abb0d628f98f09a07f7f7054405b5a3b *src/habitat4.cc
 4ff80e954648c621a31aa06b40d8b08f *src/habitat4.h
 d7af598087171323ae6ded45b666454f *src/myData1.cc
 95b4f7167f9db6f6b41a5ab1b4442b05 *src/myDerivs1.cc

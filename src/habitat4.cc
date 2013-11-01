@@ -290,7 +290,7 @@ void calcDerivEtaMu( vector<double> &etaDerivsI, const myData &dat, const vector
 
 double logBernDer( double y, double mu)
 {
-	double tmp;
+	double tmp, negOne = -1.0;
 	if( y==1){
 		tmp = 1/mu;
 		return( tmp);
@@ -299,7 +299,7 @@ double logBernDer( double y, double mu)
 		tmp = -1/(1-mu);
 		return( tmp);
 	}
-	return( log( -1));	//to give an error
+	return( log( negOne));	//to give an error
 }
 
 void calcAlphaDeriv( vector<double> &alphaDerivsI, const vector<double> &etaDerivs, const myData &dat)
