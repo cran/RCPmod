@@ -1,43 +1,37 @@
-#include"habitat4.h"
-#include"habiPred1.h"
+#include"rcp4.h"
+#include"rcpPred4.h"
 
-extern "C" { SEXP Habitat_predict_C( SEXP RX, SEXP Ry,
-																	 SEXP Ralpha, SEXP Rtau, SEXP Rbeta,
-																	 SEXP RalphaBoot, SEXP RtauBoot, SEXP RbetaBoot,
-																	 SEXP RS, SEXP RG, SEXP RnObs, SEXP Rp, SEXP Rnboot,
-																	 SEXP RptPreds, SEXP RbootPreds, SEXP Rtype,
-																	 SEXP Rconc, SEXP Rsd)
+extern "C" { SEXP RCP_predict_C( SEXP Ry, SEXP RX, SEXP RW, SEXP Roffset, SEXP Rwts,
+				SEXP RS, SEXP RG, SEXP Rp, SEXP Rpw, SEXP RnObs, SEXP Rdisty,
+				SEXP Ralpha, SEXP Rtau, SEXP Rbeta, SEXP Rgamma, SEXP Rdisps, SEXP Rpowers,
+				SEXP Rconc, SEXP Rsd, SEXP RsdGamma, SEXP RdispLocat, SEXP RdispScale,
+				SEXP RalphaBoot, SEXP RtauBoot, SEXP RbetaBoot,	//only using parameters associated with pis. That is what we are predicting.
+				SEXP Rnboot,
+				SEXP RptPreds, SEXP RbootPreds, SEXP RoptiDisp)
 {
 	allClasses all;
 	int nboot = *(INTEGER(Rnboot));
 	double *bootalpha, *boottau, *bootbeta, *bootParms;
 	double *ptPreds, *bootPreds;
-	int type = *(INTEGER( Rtype));
-	int bootCount;
+//	int type = *(INTEGER( Rtype));
+//	int bootCount;
 
 	//initialise the data structures -- they are mostly just pointers to REAL()s...
-	all.data.setVals( Ry, RX, RS, RG, Rp, RnObs);	//read in the data
-	all.parms.setVals( all.data, Ralpha, Rbeta, Rtau, Rconc, Rsd);	//read in the parameters
+	all.data.setVals( Ry, RX, RW, Roffset, RS, RG, Rp, Rpw, RnObs, Rdisty, RoptiDisp, Rwts);	//read in the data
+	all.parms.setVals( all.data, Ralpha, Rbeta, Rtau, Rgamma, Rdisps, Rpowers, Rconc, Rsd, RsdGamma, RdispLocat, RdispScale);	//read in the parameters
 
+	//not creating a myFits object, as the data structure for the bootstrap fits is not present.
 	vector<double> logPis(all.data.nG, all.data.NAnum);//, pis( dat.nG, dat.NAnum);
 	vector< vector<double> > allPis( all.data.nObs, vector<double> (all.data.nG, all.data.NAnum));	//(nObs x nG) matrix --2D
-	vector<double> allMus( all.data.nG*all.data.nS, all.data.NAnum);	//(nG x nS) matrix
 
 	ptPreds = REAL( RptPreds);
 	for( int i=0; i<all.data.nObs; i++)
 		calcLogPis( logPis, allPis.at(i), all.data, all.parms, i);
-	if( type == 1){
-		for( int g=0; g<all.data.nG; g++)
-			for( int i=0; i<all.data.nObs; i++)
-				ptPreds[MATREF(i,g,all.data.nObs)] = allPis.at(i).at(g);
-	}
-	if( type == 0){
-		calcMuFits( allMus, all.data, all.parms);
-		bootCount = 0;
-		calcMargFits( ptPreds, bootCount, allMus, allPis, all.data);
-	}
+	for( int g=0; g<all.data.nG; g++)
+		for( int i=0; i<all.data.nObs; i++)
+			ptPreds[MATREF(i,g,all.data.nObs)] = allPis.at(i).at(g);
 
-	//setting up the bootstrap values for alpha, tau and beta
+	//setting up the bootstrap values for alpha, tau, beta, disps
 	bootalpha = REAL( RalphaBoot);
 	boottau = REAL( RtauBoot);
 	bootbeta = REAL( RbetaBoot);
@@ -65,19 +59,11 @@ extern "C" { SEXP Habitat_predict_C( SEXP RX, SEXP Ry,
 		int place;
 		for( int i=0; i<all.data.nObs; i++)
 			calcLogPis( logPis, allPis.at(i), all.data, all.parms, i);
-		if( type == 1){
-			for( int g=0; g<all.data.nG; g++)
-				for( int i=0; i<all.data.nObs; i++){
-					place = MATREF( MATREF(i,g,all.data.nObs),b,(all.data.nObs*all.data.nG));
-					//place = MATREF( MATREF(i,all.data.nObs*all.data.nS+g,all.data.nObs),b,(all.data.nObs*(all.data.nS+all.data.nG)));
-					bootPreds[place] = allPis.at(i).at(g);
-				}
-		}
-		if( type == 0){
-			calcMuFits( allMus, all.data, all.parms);
-			calcMargFits( bootPreds, b, allMus, allPis, all.data);
-		}
-
+		for( int g=0; g<all.data.nG; g++)
+			for( int i=0; i<all.data.nObs; i++){
+				place = MATREF3D(i,g,b,all.data.nObs, all.data.nG);//MATREF( MATREF(i,g,all.data.nObs),b,(all.data.nObs*all.data.nG));
+				bootPreds[place] = allPis.at(i).at(g);
+			}
 	}
 
 	SEXP Rres;	//R object to return -- it is meaningless!
@@ -92,7 +78,7 @@ extern "C" { SEXP Habitat_predict_C( SEXP RX, SEXP Ry,
 
 }
 
-void calcMargFits( double *ptPreds, int bootCount, const vector<double> &allMus, const vector< vector<double> > &allPis, const myData &dat)
+/*void calcMargFits( double *ptPreds, int bootCount, const vector<double> &allMus, const vector< vector<double> > &allPis, const myData &dat)
 {
 	for( int i=0; i<dat.nObs; i++)
 		for( int s=0; s<dat.nS; s++){
@@ -101,4 +87,4 @@ void calcMargFits( double *ptPreds, int bootCount, const vector<double> &allMus,
 				ptPreds[MATREF(MATREF(i,s,dat.nObs),bootCount,(dat.nObs*dat.nS))] += allMus.at(MATREF(g,s,dat.nG))*allPis.at(i).at(g);
 		}
 
-}
+}*/

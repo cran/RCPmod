@@ -1,9 +1,9 @@
 \name{print.regimix}
 \alias{print.regimix}
 \title{Prints a regimix object.}
-\description{Prints a regimix object. It may be useful for something.
+\description{Prints some attributes of a regimix object.
 }
-\section{Method}{ print( x, \dots{})
+\section{Method}{ print( x, ...)
 }
 \arguments{
 \item{ x}{an object obtained from fitting a RCP mixture model. Such as that generated from a call to regimix(qv).}

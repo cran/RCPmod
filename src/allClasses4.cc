@@ -1,5 +1,5 @@
 //functions for allClasses class
-#include"habitat4.h"
+#include"rcp4.h"
 
 allClasses::allClasses(){};
 allClasses::~allClasses(){};

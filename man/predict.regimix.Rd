@@ -3,16 +3,23 @@
 \title{Predicts from a regimix object.}
 \description{Predicts RCP probabilities at a series of sites. Confidence intervals are available too.
 }
-\section{Method}{ predict( object, ..., newdata=NULL, nboot=0, alpha=0.95)
+\section{Method}{ predict( object, object2=NULL, ..., newdata=NULL, nboot=0, alpha=0.95, mc.cores=1)
 }
 \arguments{
 \item{ object}{an object obtained from fitting a RCP mixture model. Such as that generated from a call to regimix(qv).}
+\item{ object2}{a regiboot object obtained from bootstrapping the regimix object. Such as that generated from a call to regiboot(qv). If not supplied, then predict.regimix will do parametric bootstrapping (otherwise non-parametric bootstrap).}
 \item{ newdata}{a data.frame (or something that can be coerced) containing the values of the covariates where predictions are to be made. If NULL (the default) then predictions are made at the locations of the original data.}
-\item{ nboot}{the number of parametric bootstrap samples to take for the bootstrap predictions, standard errors and confidence intervals. The default is 0, that is no bootstrapping is to be done and point predictions only are given.}
+\item{ nboot}{the number of parametric bootstrap samples to take for the bootstrap predictions, standard errors and confidence intervals. The default is 0, that is no bootstrapping is to be done and point predictions only are given. If object2 is not NULL, then the number of bootstrap samples is taken from that object (this argument is then ignored).}
 \item{ alpha}{a numeric within [0,1] (well [0.5,1] really) indicating the specified confidence for the confidence interval. Argument is redundant if nboot == 0.}
+\item{ mc.cores}{the number of cores to spread the computations over. Ignored if running on a Windows machine.}
 \item{ ...}{ignored}
 }
-\details{This function can take a while to run -- it is a bootstrap function. nboot samples of the parameters are taken and then used to predict at each set of covariates defined in newdata. Quantiles of the resulting sets of bootstrap predictions are then taken. It is the last step that really takes a while.
+\details{
+This function implements two separate, and quite different, bootstrapping routines. The first, attributable to Foster et al (2013), which implements a \emph{parametric} bootstrap, whereby parameters are drawn from their sampling distribution (defined by the ML estimates and their asymptotic vcov matrix). Yes, the vcov function needs to be run first and stored in the the regimix object as $vcov. Typically, the vcov matrix is obtained using numerical derivatives, which can be slow to calculate and somewhat unstable/erratic. This was the original suggestion and has been superceeded by the \emph{non-parametric} bootstrap routine. This is described in Foster et al (in prep) and bootstraps the sampling site data repeatedly, and for each bootstrap sample the model is re-estimated. Variation in the bootstrap samples is carried forward to the prediction step to guage the uncertainty.
+
+The parametric bootsrap implementation of this function can take a while to run -- it is a bootstrap function. nboot samples of the parameters are taken and then used to predict at each set of covariates defined in newdata. Quantiles of the resulting sets of bootstrap predictions are then taken. It is the last step that really takes a while. The non-parametric version of this function should not take as long as the grunt work of bootstrapping is carried out in the regiboot(qv) function.
+
+Note that this function is not implemented. It could be, using the parallel package, but it is currently not. The bulk of the bootstrap calculations are done in C++, which reduces the waiting time but parallelising it would be even better.
 }
 \value{
 If nboot==0 then a n x H matrix of prior predictions (n=nrow(newdata), H=number of RCPs). Each row should sum to one.

@@ -1,0 +1,41 @@
+citHeader("To cite the RCPmod package in publications use:")
+
+citEntry(
+	entry="Article",
+    title = "Modelling Regions of Common Profiles Using Biological and Environmental Data",
+	author = personList(as.person("S.D. Foster"), 
+						as.person("G.H. Givens"),
+						as.person("G.J. Dornan"),
+						as.person("P.K. Dunstan"),
+						as.person("R. Darnell")),
+	 year = 2013,     
+     journal="Environmetrics",
+     volume= "24",
+	 pages="489--499",
+	 year="2013",
+	 textVersion = paste("Foster, S.D., Givens, G.H., Dornan, G.J., Dunstan, P.K. and Darnell, R. (2013) Modelling Regions of Common Profiles Using Biological and Environmental Data. Environmetrics 24: 489-499. DOI: 10.1002/env.2245")
+)
+
+citEntry(
+ entry="Article",
+ title= "Ecological Groupings of Sample Sites in the Presence of Sampling Artefacts",
+ author = personList(as.person("S.D. Foster"), 
+    				 as.person("M. Lyons"),
+					 as.person("N. Hill")),
+ journal="NA",
+ pages="NA--NA",
+ year="in review",
+ textVersion="Foster, S.D., Lyons, M. and Hill, N. (in review) Ecological Groupings of Sample Sites in the Presence of Sampling Artefacts."
+)
+
+citEntry(
+ entry="Article",
+ title="A model-based approach to vegetation classification",
+ author=personList( as.person( "M. Lyons"), 
+					as.person( "S.D. Foster"), 
+					as.person( "D. Keith")),
+ journal="NA",
+ pages="NA--NA",
+ year="in review",
+ textVersion="Lyons, M., Foster, S. and Keith, D. (in review) A model-based approach to vegetation classification."
+)

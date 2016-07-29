@@ -1,16 +1,41 @@
 export( "AIC.regimix",
 "BIC.regimix",
 "coef.regimix",
+"cooks.distance.regimix",
 "extractAIC.regimix",
 "logLik.regimix",
 "orderFitted",
+"orderPost",
 "plot.regimix",
+"plot.registab",
 "predict.regimix",
+"print.regimix",
+"regiboot",
 "regimix",
+"regimix.multifit",
+"residuals.regimix",
 "simRCPdata",
+"stability.regimix",
+"summary.regimix",
 "vcov.regimix")
-import( numDeriv)
+import( glmnet)
+import( fishMod)
+import( MASS)
 import( gtools)
+import( parallel)
+import( stats)
+import( graphics)
 S3method( "print", "regimix")
 S3method( "summary", "regimix")
+S3method( "AIC", "regimix")
+S3method( "BIC", "regimix")
+S3method( "coef", "regimix")
+S3method( "cooks.distance", "regimix")
+S3method( "extractAIC", "regimix")
+S3method( "logLik", "regimix")
+S3method( "predict", "regimix")
+S3method( "residuals", "regimix")
+S3method( "vcov", "regimix")
+S3method( "plot", "regimix")
+S3method( "plot", "registab")
 

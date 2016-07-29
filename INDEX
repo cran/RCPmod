@@ -1,13 +1,19 @@
-AIC.regimix                                     Information criterion for a regimix model.
-BIC.regimix                                     Information criterion for a regimix model.
-coef.regimix                                    A regimix objects coefficients.
-extractAIC.regimix                              Extracts the AIC for a fitted refimix model.
-logLik.regimix                                  The log likelihood for a regimix model.
-orderFitted                                     Assesses classification error and re-orders parameters
-plot.regimix                                    Plots a regimix object.
-predict.regimix                                 Predicts from a regimix object.
-print.regimix                                   Prints a regimix object.
-regimix                                         Fits a regimix model.
-simRCPdata                                      Simulates from a regimix model
-summary.regimix                                 Summarises a regimix object.
-vcov.regimix                                    Variance matrix for a regimix object.
+AIC.regimix                         Information criterion for a regimix model.
+coef.regimix                        A regimix objects coefficients.
+cooks.distance.regimix              Calculates leave-some-out statistics for a regimix object, principally
+                                    a version of Cook's distance and cross-validated predictive logl
+extractAIC.regimix                  Extracts the AIC for a regimix model.
+logLik.regimix                      The log likelihood for a regimix model.
+orderFitted                         Assesses classification error and re-orders parameters for simulated
+                                    data (orderFitted) or for two fits (orderPost).
+plot.regimix                        Plots residuals from a regimix x.
+plot.registab                       Diagnostic plotting to see if RCP groups are stable
+predict.regimix                     Predicts from a regimix object.
+print.regimix                       Prints a regimix object.
+regiboot                            Bootstraps a regimix object.
+regimix                             Fits a regimix model.
+residuals.regimix                   Residuals for a regimix object.
+simRCPdata                          Simulates from a regimix model
+stability.regimix                   Diagnostic checks to see if RCP groups are stable
+summary.regimix                     Summarises a regimix object.
+vcov.regimix                        Variance matrix for a regimix object.
