@@ -165,6 +165,7 @@ function( model, ..., oosSize=1, times=model$n, mc.cores=1, quiet=FALSE)
     control <- model$titbits$control
     control$quiet <- TRUE
     control$trace <- 0
+    control$optimise <- TRUE
     tmpmodel <- regimix.fit(outcomes = model$titbits$Y, 
       W = model$titbits$W, X = model$titbits$X, offy = model$titbits$offset, 
       wts = new.wts, disty = model$titbits$disty, nRCP = model$nRCP, 
