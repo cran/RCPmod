@@ -1,9 +1,8 @@
-a9404fbb665602a31127113afa92b400 *DESCRIPTION
+f806175ee07bf94c5c5399eabb3fa2a7 *DESCRIPTION
 482e36f06dad628969c7e48fc93cd749 *INDEX
 a31a5dde4d2a17ae5c1b98cb4266f18b *NAMESPACE
-2f046ec14c2b8d6be4e9be13bbee62bc *NEWS
-eea9bf8b1455b71008651d1cbf5a1cde *R/RCPmod.R
-d3b430b15de3efd908a502243014d22e *R/sysdata.rda
+628b848d564d7e8d5b502010660f9360 *R/RCPmod.R
+6426e87184c9ed0d66daf21fd6c9395c *R/sysdata.rda
 de48882022aadf5330d14c7dd542de44 *inst/CITATION
 36d4e06b107482e4bf89ceff5b524d05 *man/AIC.regimix.Rd
 176fd7ff64f8b3106e8e3e4efa2eb4c4 *man/coef.regimix.Rd
@@ -12,11 +11,11 @@ af30390c38db1c4076a4f9d7cfd624fe *man/extractAIC.regimix.Rd
 09d21ec8e99bfbc855621c7c1fe03217 *man/logLik.regimix.Rd
 93acf18e86ab759f2b691901bfd48eb7 *man/orderFitted.Rd
 3a359cf10a8c5e513aed60c391a7d367 *man/plot.regimix.Rd
-8a0f476d9f72d6ecd1292ec9f4051c01 *man/plot.registab.Rd
+48000712968027023559674356713364 *man/plot.registab.Rd
 3ff842a55d9ce1c8530189bca1795582 *man/predict.regimix.Rd
 73ceff89a09ef13fb491220f01a447ea *man/print.regimix.Rd
 da2cb301c954f255fd2406baa9024da7 *man/regiboot.Rd
-72ed232e30199729f3db1ff60ad701e9 *man/regimix.Rd
+a8c1b41468814ccf92f35df2100bc6bd *man/regimix.Rd
 b41733a30900124648b9bd9620230502 *man/residuals.regimix.Rd
 71f35e86de52694202c75e386c019976 *man/simRCPdata.Rd
 9dc00287b697c4b3b4d1e7c7b35eb352 *man/stability.regimix.Rd
@@ -31,7 +30,7 @@ e8174077b89102f445605b738b5ad23d *src/myDerivs4.cc
 b15a09d342b21adbf509bbe4d3a10523 *src/myFits4.cc
 a9d50e5a2dd95cd5ff73199bc1151fc4 *src/myOptCont4.cc
 6ddc9bce577f0ab91e9a1e27889aa66a *src/myParms4.cc
-9f8165180f32506bad84c92e2e435ec5 *src/rcp4.cc
+53b09eae9770bf06388593a705e79e8c *src/rcp4.cc
 7f3f643645496250514791e92105f4a1 *src/rcp4.h
 d9e37ca1e840c5eae8cbb9a34e5fca87 *src/rcpPred4.cc
 f982cb76a8f956d118bb90b1e1b4eb0a *src/rcpPred4.h

@@ -833,7 +833,10 @@ function( outcomes, X, W, offy, wts, S, nRCP, p.x, p.w, n, disty, start.vals, po
   if( any( ret$scores$disp==-999999, na.rm=TRUE))
     ret$scores$disp <- NULL
   ret$logCondDens <- matrix(logCondDens, ncol = nRCP)
-  ret$conv <- conv
+  if( control$optimise)
+    ret$conv <- conv
+  else
+    ret$conv <- "not optimised"
   ret$S <- S; ret$nRCP <- nRCP; ret$p.x <- p.x; ret$p.w <- p.w; ret$n <- n
   ret$start.vals <- inits
   ret$logl <- tmp
@@ -1121,20 +1124,36 @@ function (x, ..., type="RQR", nsim = 100, alpha.conf = c(0.9, 0.95, 0.99), quiet
 
 
 "plot.registab" <-
-function(x, y, ...){
-    par( mfrow=c(1,2))
-    #first plot the cooksD stats
-    matplot( c(0,x$oosSizeRange), rbind(0,x$disty), type='b', ylab="Distance from Full Model Predictions", xlab="Number of Obs Removed", main="Stability of Group Predictions", col=1:x$nRCP, pch=as.character( 1:x$nRCP), lty=1)
-    legend( "topleft", bty='n', lty=1, pch=as.character( 1:x$nRCP), col=1:x$nRCP, legend=paste( "RCP ", 1:x$nRCP, sep=""))
-    #now for the predLogL stats
-    plot( rep( x$oosSizeRange, each=prod( dim( x$predlogls[1,,]))), x$predlogls, pch=20, ylab="Pred LogL (OOS)", xlab="Number of Obs Removed", main="Stability of Pred Logl", xlim=c(0,max( x$oosSizeRange)), type='n')
-    points( rep( 0, x$n), x$logl.sites, col='blue', pch=20)
-    for( ii in x$oosSizeRange){
-      points( rep( ii, prod( dim( x$predlogls[1,,]))), x$predlogls[x$oosSizeRange==ii,,], pch=20)
+function(x, y, minWidth=1, ncuts=111, ylimmo=NULL, ...) 
+{
+    par(mfrow = c(1, 2))
+    matplot(c(0, x$oosSizeRange), rbind(0, x$disty), type = "b", 
+        ylab = "Distance from Full Model Predictions", xlab = "Number of Obs Removed", 
+        main = "Stability of Group Predictions", col = 1:x$nRCP, 
+        pch = as.character(1:x$nRCP), lty = 1)
+    legend("topleft", bty = "n", lty = 1, pch = as.character(1:x$nRCP), 
+        col = 1:x$nRCP, legend = paste("RCP ", 1:x$nRCP, sep = ""))
+    oosDiffs <- diff( c(0,x$oosSizeRange))
+    oosWidth <- max( minWidth, min( oosDiffs)) / 2
+    histy <- list()
+    for( ii in 1:length( x$oosSizeRange)){
+      tmp <- na.exclude( as.numeric( x$predlogls[ii,,]))
+      histy[[ii]] <- hist( tmp, breaks=ncuts, plot=FALSE)
     }
-    lines( c(0,x$oosSizeRange), c(mean(x$logl.sites), apply( x$predlogls, 1, mean, na.rm=TRUE)), lwd=2, col='red')
-    
-    invisible( TRUE)
+    max.dens <- max( sapply( sapply( histy, function(x) x$density), max)) 
+    if( is.null( ylimmo))
+      ylimmo <- range( sapply( histy, function(x) x$breaks))
+    plot( 0, 0, ylab = "Pred LogL (OOS)", xlab = "Number of Obs Removed", main = "Stability of Pred Logl", xlim = c(0-oosWidth, max(x$oosSizeRange)+oosWidth), ylim=ylimmo, type = "n")
+    for( ii in 1:length( x$oosSizeRange))
+      for( jj in 1:length( histy[[ii]]$density))
+        rect( xleft=x$oosSizeRange[ii]-oosWidth, xright=x$oosSizeRange[ii]+oosWidth, ybottom=histy[[ii]]$breaks[jj], ytop=histy[[ii]]$breaks[jj+1], col=rgb( colorRamp( c("#E6FFFF","blue"))(histy[[ii]]$density[jj]/max.dens), maxColorValue=255), border=NA)
+    tmp <- na.exclude( as.numeric( x$logl.sites))
+    histy <- hist( tmp, breaks=ncuts, plot=FALSE)
+    for( jj in 1:length( histy$density))
+      rect( xleft=0-oosWidth, xright=0+oosWidth, ybottom=histy$breaks[jj], ytop=histy$breaks[jj+1], col=rgb( colorRamp( c("#FFE6FF","red"))(histy$density[jj]/max( histy$density)), maxColorValue=255), border=NA)
+    lines(c(0, x$oosSizeRange), c(mean(x$logl.sites), apply(x$predlogls, 
+        1, mean, na.rm = TRUE)), lwd = 2, col = "black")
+    invisible(TRUE)
 }
 
 
@@ -1622,7 +1641,8 @@ function (form.RCP = NULL, form.spp = NULL, data, nRCP = 3, dist="Bernoulli", of
     #Fit the model many times
     many.starts <- parallel::mclapply(1:nstart, tmp.fun, mc.cores=mc.cores)
     
-   # message("")
+    if( !control$quiet)
+      message("")
 
     return(many.starts)
 }
@@ -2061,7 +2081,10 @@ function( outcomes, X, W, offy, wts, S, nRCP, p.x, p.w, n, disty, start.vals, po
   if( any( ret$scores$disp==-999999, na.rm=TRUE))
     ret$scores$disp <- NULL
   ret$logCondDens <- matrix(logCondDens, ncol = nRCP)
-  ret$conv <- conv
+  if( control$optimise)
+    ret$conv <- conv
+  else
+    ret$conv <- "not optimised"
   ret$S <- S; ret$nRCP <- nRCP; ret$p.x <- p.x; ret$p.w <- p.w; ret$n <- n
   ret$start.vals <- inits
   ret$logl <- tmp
@@ -2443,7 +2466,17 @@ globalVariables( package="RCPmod",
     ,"fitted.scale"
     ,"loggy"
     ,"oosSizeRange"
+    ,"oosDiffs"
+    ,"oosWidth"
+    ,"minWidth"
+    ,"histy"
     ,"predlogls"
+    ,"ncuts"
+    ,"max.dens"
+    ,"ylimmo"
+    ,"breaks"
+    ,"rgb"
+    ,"colorRamp"
     ,"newdata"
     ,"titbit"
     ,"object2"

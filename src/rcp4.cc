@@ -54,6 +54,9 @@ extern "C" { SEXP RCP_C( SEXP Ry, SEXP RX, SEXP RW, SEXP Roffset, SEXP Rwts,
 	double *tmplogls = REAL( Rlogli);
 	for( int i=0; i<all.data.nObs; i++)
 		tmplogls[i] = all.fits.allLogls.at(i);
+	//Convergence code
+	int *tmpconv = INTEGER( Rconv);
+	tmpconv[0] = all.contr.ifail;
 	//the logl
 	SEXP Rres;	//R object to return -- it is the logl!
 	Rres = PROTECT( allocVector(REALSXP,1));

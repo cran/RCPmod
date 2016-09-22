@@ -61,7 +61,7 @@ regimix returns an object of class \code{regimix} and regimix.multfit returns a 
 \item{ BIC}{Bayesian information criterion for the maximised model.}
 \item{ call}{the call to the function.}
 \item{ coefs}{a list of three elements, one each for the estimates for the species prevalence (alpha), the deviations from alpha for the first (nRCP-1) RCP (tau), and the (nRCP-1) sets of RCP regression coefficents (beta).}
-\item{ conv}{the convergence code from the maximisation procedure. See ?optim for an explanation.}
+\item{ conv}{the convergence code from the maximisation procedure. See ?optim for an explanation (basically 0 is good and anything else is bad).}
 \item{ dist}{the character string identifying the distribution used for the model.}
 \item{ logCondDens}{an nObs by nRCP matrix specifying the probability of observing each sites"'" data, given each of the RCP types.}
 \item{ logl}{the maximised log likelihood.}
