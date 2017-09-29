@@ -32,7 +32,7 @@
 
  Likewise a typical formula for use in the form.spp argument will have the form (for example) ~1+fac1+cov1. This signifies that the catchabilities of each species depends upon the levels of the factor fac1 and the covariate cov1. See ?glm for a description of how the right hand side of the formula is expanded.
 
- The computation strategy for the default method, which has been demonstrated to work for all data sets encountered thus far, is fully described in Foster et al (2013) and Foster et al (in prep.). We note however, that it is a good idea to standardise covariates prior to calling regimix. This is not formally required by the model, but the method to obtain starting values is based on a penalised likelihood, which is dependent on covariate scale. To recap, the starting values are dependent on covariate scale but the final solution (if it can be found given starting values) should not be.
+ The computation strategy for the default method, which has been demonstrated to work for all data sets the developers have encountered thus far, is fully described in Foster et al (2013) and Foster et al (2017). We note however, that it is a good idea to standardise covariates prior to calling regimix. This is not formally required by the model, but it does drastically reduce the chance of numerical issues in the first iteration. If you choose to NOT standardise, then you should at least choose a scale that is reasonable (so that the numerical range is measured by units and not thousands of units). This may mean that the units may be, for example, kilometres (and not metres), or 100s of kilometres (and not metres/kilometres).
 
  We do not, on purpose, provide residuals as a routine part of the model. Users should use the residuals.regimix(qv) function to obtain them. We do this as the type of residual needs to be specified (although we recommend type=="RQR" for routine use).
 
@@ -82,7 +82,7 @@ regimix returns an object of class \code{regimix} and regimix.multfit returns a 
 \references{
 Foster, S.D., Givens, G.H., Dornan, G.J., Dunstan, P.K. and Darnell, R{}. (2013) Modelling Regions of Common Profiles Using Biological and Environmental Data. Environmetrics \emph{24}: 489--499. DOI: 10.1002/env.2245
 
-Foster, S.D., Lyons, M. and Hill, N. (in prep.) Ecological Groupings of Sample Sites in the presence of sampling artefacts.
+Foster, S.D., Lyons, M. and Hill, N. (2017) Ecological Groupings of Sample Sites in the presence of sampling artefacts. Journal of the Royal Statistical Society -- Series C \emph{XX}: XX--XX. DOI: 10.1111/rssc.12211
 }
 \examples{
 #simulate data

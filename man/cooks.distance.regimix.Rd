@@ -25,17 +25,17 @@ An object of class \code{regiCooksD}. It is a list of 4 elements:
 \examples{
 \dontrun{
 #not run as R CMD check complains about the time taken.
-#This code will take a little while to run (about 0.5 minutes on my computer)
+#This code will take a little while to run (<1 minute on my computer)
 #For leave-one-out cooks distance, use oosSize=1
 #for serious use times will need to be larger.
 system.time(\{
 example( regimix);
 cooksD <- cooks.distance( fm, oosSize=10, times=25)
 \})
-}
 example( regimix)  #will fit a model and store in fm
 #for serious use times will need to be larger.
 #For leave-one-out cooks distance, use oosSize=1
 cooksD <- cooks.distance( fm, oosSize=10, times=5)
+}
 }
 \keyword{misc}

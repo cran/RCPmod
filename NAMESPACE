@@ -1,3 +1,4 @@
+useDynLib( RCPmod, .registration = TRUE)
 export( "AIC.regimix",
 "BIC.regimix",
 "coef.regimix",

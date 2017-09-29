@@ -204,7 +204,7 @@ function( model, ..., oosSize=1, times=model$n, mc.cores=1, quiet=FALSE)
     logCondDens <- as.numeric(matrix(NA, nrow = model$n, ncol = model$nRCP))
     logls <- as.numeric(rep(NA, model$n))
     conv <- as.integer(0)
-    tmplogl <- .Call("RCP_C", as.numeric( model$titbits$Y), as.numeric(model$titbits$X), as.numeric( model$titbits$W), as.numeric(model$titbits$offset), as.numeric(model$titbits$wts),
+    tmplogl <- .Call( "RCP_C", as.numeric( model$titbits$Y), as.numeric(model$titbits$X), as.numeric( model$titbits$W), as.numeric(model$titbits$offset), as.numeric(model$titbits$wts),
           as.integer(model$S), as.integer(model$nRCP), as.integer(model$p.x), as.integer(model$p.w), as.integer(model$n), as.integer( model$titbits$disty),
           as.numeric( tmpmodel$coef$alpha), as.numeric( tmpmodel$coef$tau), as.numeric( tmpmodel$coef$beta), as.numeric( gamma), as.numeric( tmpmodel$coef$disp), as.numeric( model$titbits$power),
           as.numeric(model$titbits$control$penalty), as.numeric(model$titbits$control$penalty.tau), as.numeric(model$titbits$control$penalty.gamma), as.numeric(model$titbits$control$penalty.disp[1]), as.numeric(model$titbits$control$penalty.disp[2]),
@@ -399,13 +399,13 @@ function( outcomes, W, X, offy, wts, disty, G, S, power, inits, quiet=FALSE)
       if( length( W) != 1)
         gamma[ss,] <- my.coefs[-(1:(G+1))]
       if( disty == 3){
-        tmp <- MASS::theta.mm( outcomes[,ss], as.numeric( predict( tmp.fm, s=locat.s, type="response", newx=df, offset=offy)), weights=wts, dfr=nrow(outcomes), eps=1e-4)
+        tmp <- MASS::theta.mm( outcomes[,ss], as.numeric( predict( tmp.fm, s=locat.s, type="response", newx=df, newoffset=offy)), weights=wts, dfr=nrow(outcomes), eps=1e-4)
         if( tmp>2)
           tmp <- 2
         disp[ss] <- log( 1/tmp)
       }
       if( disty == 5){
-        preds <- as.numeric( predict(tmp.fm, s=locat.s, type="link", newx=df, offset=offy))
+        preds <- as.numeric( predict(tmp.fm, s=locat.s, type="link", newx=df, newoffset=offy))
         disp[ss] <- log( sqrt( sum((outcomes[,ss] - preds)^2)/nrow( outcomes)))  #should be something like the resid standard Deviation.
       }
     }
@@ -440,8 +440,11 @@ function( outcomes, W, X, offy, wts, disty, G, S, power, inits, quiet=FALSE)
     alpha <- alpha + rnorm(S, sd = my.sd)
     my.sd <- mult*sd( tau); if( is.na( my.sd)) my.sd <- 0.1
     tau <- tau + as.numeric(matrix(rnorm((G - 1) * S, sd = my.sd), ncol = G - 1))
-    my.sd <- mult*sd( beta); if( is.na( my.sd) | my.sd==0) my.sd <- 0.1
-    beta <- beta + as.numeric(matrix(rnorm((G - 1) * ncol(X), mean = 0, sd = my.sd), ncol = ncol(X), nrow = G - 1))
+    my.sd <- mult*apply( beta[,-1], 2, sd)
+    if( any( is.na( my.sd)) | any( my.sd== 0))
+      my.sd <- cbind( rep( 0.1, (G-1)), #for the intercepts
+                      0.1*matrix( rep( 1/apply( X[,-1], 2, function(x) sd(x)), each=G-1), nrow=G-1, ncol=ncol( X)-1))  #for the covariates
+    beta <- beta + as.numeric( matrix( rnorm((G - 1) * ncol(X), mean = 0, sd = my.sd), ncol = ncol(X), nrow = G - 1))
     if( length( W) != 1 & !is.null( W)){
       my.sd <- mult*sd( gamma); if( is.na( my.sd) | my.sd==0) my.sd <- 0.1
       gamma <- gamma + as.numeric( matrix( rnorm( S*ncol(W), mean=0, my.sd), ncol=ncol( W), nrow=S))
@@ -553,6 +556,15 @@ function( form.RCP, mf.X)
   form.X[[2]] <- NULL
   form.X <- as.formula(form.X)
   X <- model.matrix(form.X, mf.X)
+
+  tmp <- apply( X[,!grepl("(Intercep)", colnames( X))], 2, sd)
+  eps <- 2
+  if( any( tmp*eps > 2 & tmp != 0) ){
+      message( "##At least one of the covariates has non-standardised (approx.) scaling.")
+      message( "##Please consider rescaling to avoid numerical issues.")
+      message( "##The function should still run, but results may be unstable.")
+      message( "##See ?regimix details section.")
+  }
 
   return( X)
 }
@@ -805,7 +817,7 @@ function( outcomes, X, W, offy, wts, S, nRCP, p.x, p.w, n, disty, start.vals, po
   logls <- as.numeric(rep(NA, n))
   conv <- as.integer(0)
 
-  tmp <- .Call("RCP_C", as.numeric(outcomes), as.numeric(X), as.numeric(W), as.numeric( offy), as.numeric( wts),
+  tmp <- .Call( "RCP_C", as.numeric(outcomes), as.numeric(X), as.numeric(W), as.numeric( offy), as.numeric( wts),
           as.integer(S), as.integer(nRCP), as.integer(p.x), as.integer(p.w), as.integer(n), as.integer( disty),
           alpha, tau, beta, gamma, disp, power,
           as.numeric(control$penalty), as.numeric(control$penalty.tau), as.numeric( control$penalty.gamma), as.numeric( control$penalty.disp[1]), as.numeric( control$penalty.disp[2]),
@@ -1027,7 +1039,7 @@ function (x, ..., type="RQR", nsim = 100, alpha.conf = c(0.9, 0.95, 0.99), quiet
       if( !quiet)
         setTxtProgressBar(pb, s)
       newy <- as.matrix( simRCPdata( nRCP=nRCP, S=S, n=n, p.x=p.x, p.w=p.w, alpha=alpha, tau=tau, beta=beta, gamma=gamma, logDisps=disp, powers=power, X=X, W=W, offset=offy, dist=x$dist)) 
-      tmp <- .Call("RCP_C", as.numeric(newy[, 1:S]), as.numeric(X), as.numeric(W), as.numeric( offy), as.numeric( wts),
+      tmp <- .Call( "RCP_C", as.numeric(newy[, 1:S]), as.numeric(X), as.numeric(W), as.numeric( offy), as.numeric( wts),
           as.integer(S), as.integer(nRCP), as.integer(p.x), as.integer(p.w), as.integer(n), as.integer( disty),
           alpha, tau, beta, gamma, disp, power,
           as.numeric(control$penalty), as.numeric(control$penalty.tau), as.numeric( control$penalty.gamma), as.numeric( control$penalty.disp[1]), as.numeric( control$penalty.disp[2]),
@@ -1254,7 +1266,7 @@ function (object, object2 = NULL, ..., newdata = NULL, nboot = 0,
             bootSampsToUse <- (sum( segments[1:seg])-segments[seg]+1):sum(segments[1:seg])
         }
         bootPreds <- as.numeric(array(NA, c(n, predCol, nboot)))
-        tmp <- .Call("RCP_predict_C", as.numeric(-999999), as.numeric(X), 
+        tmp <- .Call( "RCP_predict_C", as.numeric(-999999), as.numeric(X), 
             as.numeric(W), as.numeric(offy), as.numeric(object$titbits$wts), 
             as.integer(S), as.integer(G), as.integer(p.x), as.integer(p.w), 
             as.integer(n), as.integer(object$titbits$disty), 
@@ -1978,7 +1990,7 @@ function( outcomes, X, W, offy, wts, S, nRCP, p.x, p.w, n, disty, start.vals, po
   Tw.phi.func <- function( phi1, spp3){
     disp3 <- disp      
     disp3[spp3] <- phi1      
-    tmp1 <- .Call("RCP_C", as.numeric(outcomes), as.numeric(X), as.numeric(W), as.numeric( offy), as.numeric( wts),
+    tmp1 <- .Call( "RCP_C", as.numeric(outcomes), as.numeric(X), as.numeric(W), as.numeric( offy), as.numeric( wts),
       as.integer(S), as.integer(nRCP), as.integer(p.x), as.integer(p.w), as.integer(n), as.integer( disty),
       alpha, tau, beta, gamma, disp3, power,
       as.numeric(control$penalty), as.numeric(control$penalty.tau), as.numeric( control$penalty.gamma), as.numeric( control$penalty.disp[1]), as.numeric( control$penalty.disp[2]),
@@ -1993,7 +2005,7 @@ function( outcomes, X, W, offy, wts, S, nRCP, p.x, p.w, n, disty, start.vals, po
     disp3 <- disp      
     disp3[spp3] <- phi1      
     tmp.disp.score <- rep( -99999, S)
-    tmp1 <- .Call("RCP_C", as.numeric(outcomes), as.numeric(X), as.numeric(W), as.numeric( offy), as.numeric( wts),
+    tmp1 <- .Call( "RCP_C", as.numeric(outcomes), as.numeric(X), as.numeric(W), as.numeric( offy), as.numeric( wts),
       as.integer(S), as.integer(nRCP), as.integer(p.x), as.integer(p.w), as.integer(n), as.integer( disty),
       alpha, tau, beta, gamma, disp3, power,
       as.numeric(control$penalty), as.numeric(control$penalty.tau), as.numeric( control$penalty.gamma), as.numeric( control$penalty.disp[1]), as.numeric( control$penalty.disp[2]),
@@ -2034,7 +2046,7 @@ function( outcomes, X, W, offy, wts, S, nRCP, p.x, p.w, n, disty, start.vals, po
       kount <- kount + 1
       tmp.old <- tmp.new
       message( "Updating Location Parameters: ", appendLF=FALSE)
-      tmp <- .Call("RCP_C", as.numeric(outcomes), as.numeric(X), as.numeric(W), as.numeric( offy), as.numeric( wts),
+      tmp <- .Call( "RCP_C", as.numeric(outcomes), as.numeric(X), as.numeric(W), as.numeric( offy), as.numeric( wts),
         as.integer(S), as.integer(nRCP), as.integer(p.x), as.integer(p.w), as.integer(n), as.integer( disty),
         alpha, tau, beta, gamma, disp, power,
         as.numeric(control$penalty), as.numeric(control$penalty.tau), as.numeric( control$penalty.gamma), as.numeric( control$penalty.disp[1]), as.numeric( control$penalty.disp[2]),
@@ -2052,7 +2064,7 @@ function( outcomes, X, W, offy, wts, S, nRCP, p.x, p.w, n, disty, start.vals, po
       tmp.new <- -tmp1$objective
     }
   }
-  tmp <- .Call("RCP_C", as.numeric(outcomes), as.numeric(X), as.numeric(W), as.numeric( offy), as.numeric( wts),
+  tmp <- .Call( "RCP_C", as.numeric(outcomes), as.numeric(X), as.numeric(W), as.numeric( offy), as.numeric( wts),
     as.integer(S), as.integer(nRCP), as.integer(p.x), as.integer(p.w), as.integer(n), as.integer( disty),
     alpha, tau, beta, gamma, disp, power,
     as.numeric(control$penalty), as.numeric(control$penalty.tau), as.numeric( control$penalty.gamma), as.numeric( control$penalty.disp[1]), as.numeric( control$penalty.disp[2]),
@@ -2166,7 +2178,7 @@ function (object, ..., object2=NULL, method = "FiniteDifference", nboot = 1000, 
       else
         disp <- -999999
       scoreContri <- -999999
-      tmp <- .Call("RCP_C", as.numeric(Y), as.numeric(X), as.numeric(W), as.numeric( offy), as.numeric( wts),
+      tmp <- .Call( "RCP_C", as.numeric(Y), as.numeric(X), as.numeric(W), as.numeric( offy), as.numeric( wts),
         as.integer(S), as.integer(nRCP), as.integer(p.x), as.integer(p.w), as.integer(n), as.integer( disty),
         alpha, tau, beta, gamma, disp, power,
         as.numeric(control$penalty), as.numeric(control$penalty.tau), as.numeric( control$penalty.gamma), as.numeric( control$penalty.disp[1]), as.numeric( control$penalty.disp[2]),
@@ -2213,7 +2225,7 @@ function (object, ..., object2=NULL, method = "FiniteDifference", nboot = 1000, 
     else
       disp <- -999999
     scoreContri <- as.numeric( matrix( NA, nrow=n, ncol=length( unlist( object$coef))))
-    tmp <- .Call("RCP_C", as.numeric(Y), as.numeric(X), as.numeric(W), as.numeric( offy), as.numeric( wts),
+    tmp <- .Call( "RCP_C", as.numeric(Y), as.numeric(X), as.numeric(W), as.numeric( offy), as.numeric( wts),
       as.integer(S), as.integer(nRCP), as.integer(p.x), as.integer(p.w), as.integer(n), as.integer( disty),
       alpha, tau, beta, gamma, disp, power,
       as.numeric(control$penalty), as.numeric(control$penalty.tau), as.numeric( control$penalty.gamma), as.numeric( control$penalty.disp[1]), as.numeric( control$penalty.disp[2]),
@@ -2386,12 +2398,12 @@ globalVariables( package="RCPmod",
     ,"tmp.fun"
     ,"intercepts"
     ,"form.X"
+    ,"eps"
     ,"en"
     ,"root"
     ,"c1"
     ,"eta"
     ,"mu"
-    ,"sigma"
     ,"double.eps"
     ,"sigma1"
     ,"method"
@@ -2414,7 +2426,6 @@ globalVariables( package="RCPmod",
     ,"D.w"
     ,"D.co"
     ,"D.n.c"
-    ,"eps"
     ,"macheps"
     ,"D.h"
     ,"D.deriv"

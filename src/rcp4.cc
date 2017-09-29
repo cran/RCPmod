@@ -176,6 +176,13 @@ void calcLogPis( vector<double> &logPis, vector<double> &pis, const myData &dat,
 	pis.at(dat.nG-1) = 1-sumpi;
 	for( int k=0; k<dat.nG; k++)
 		logPis.at(k) = log( pis.at(k));
+		
+	for( int k=0; k<dat.nG; k++){
+		if( logPis.at(k)>=0)
+			logPis.at(k) = -DBL_MIN;	//Smallest (absolute) non-zero number on your machine
+		if( !R_FINITE(logPis.at(k)))
+			logPis.at(k) = -DBL_MAX;	//Smallest (most negative) number on your machine
+	}
 
 }
 
