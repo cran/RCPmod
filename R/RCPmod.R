@@ -440,10 +440,10 @@ function( outcomes, W, X, offy, wts, disty, G, S, power, inits, quiet=FALSE)
     alpha <- alpha + rnorm(S, sd = my.sd)
     my.sd <- mult*sd( tau); if( is.na( my.sd)) my.sd <- 0.1
     tau <- tau + as.numeric(matrix(rnorm((G - 1) * S, sd = my.sd), ncol = G - 1))
-    my.sd <- mult*apply( beta[,-1], 2, sd)
-    if( any( is.na( my.sd)) | any( my.sd== 0))
+    my.sd <- mult*apply( beta[,-1,drop=FALSE], 2, sd)
+    if( any( is.na( my.sd)) | any( my.sd== 0) | any( is.na( my.sd)))  #na condition for G=2 groups
       my.sd <- cbind( rep( 0.1, (G-1)), #for the intercepts
-                      0.1*matrix( rep( 1/apply( X[,-1], 2, function(x) sd(x)), each=G-1), nrow=G-1, ncol=ncol( X)-1))  #for the covariates
+                      0.1*matrix( rep( 1/apply( X[,-1,drop=FALSE], 2, function(x) sd(x)), each=G-1), nrow=G-1, ncol=ncol( X)-1))  #for the covariates
     beta <- beta + as.numeric( matrix( rnorm((G - 1) * ncol(X), mean = 0, sd = my.sd), ncol = ncol(X), nrow = G - 1))
     if( length( W) != 1 & !is.null( W)){
       my.sd <- mult*sd( gamma); if( is.na( my.sd) | my.sd==0) my.sd <- 0.1
@@ -557,7 +557,7 @@ function( form.RCP, mf.X)
   form.X <- as.formula(form.X)
   X <- model.matrix(form.X, mf.X)
 
-  tmp <- apply( X[,!grepl("(Intercep)", colnames( X))], 2, sd)
+  tmp <- apply( X[,!grepl("(Intercep)", colnames( X)),drop=FALSE], 2, sd)
   eps <- 2
   if( any( tmp*eps > 2 & tmp != 0) ){
       message( "##At least one of the covariates has non-standardised (approx.) scaling.")

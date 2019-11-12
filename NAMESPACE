@@ -19,11 +19,11 @@ export( "AIC.regimix",
 "stability.regimix",
 "summary.regimix",
 "vcov.regimix")
-import( glmnet)
-import( fishMod)
-import( MASS)
-import( gtools)
-import( parallel)
+importFrom( "glmnet", "glmnet", "coef.glmnet")
+importFrom( "fishMod", "pTweedie", "rTweedie")
+importFrom( "MASS", "theta.mm", "glm.nb")
+importFrom( "gtools", "permutations", "rdirichlet")
+importFrom( "parallel", "mclapply")
 import( stats)
 import( graphics)
 S3method( "print", "regimix")
