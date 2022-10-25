@@ -1,7 +1,7 @@
-8d959b48beabac4fcb0566414d4198b7 *DESCRIPTION
+162c39cbef210d616f50e03a5e74f3a9 *DESCRIPTION
 482e36f06dad628969c7e48fc93cd749 *INDEX
 76a6aa833f5ccb5fb5a5e48e41d58f99 *NAMESPACE
-9a1bfd8b0575dd05b6580bd06605a580 *R/RCPmod.R
+51ac64cb8250d62bb833e9f056395c4f *R/RCPmod.R
 5a265ec9e43a3d9c9990a2d0228d6d7c *R/sysdata.rda
 de48882022aadf5330d14c7dd542de44 *inst/CITATION
 36d4e06b107482e4bf89ceff5b524d05 *man/AIC.regimix.Rd
@@ -27,10 +27,10 @@ b71ccb51c57caf359a3071fc3a224a4d *src/Tweedie.cc
 f9353a8c92cc1a247cd2975e3ecac85d *src/TweedieDeriv.cc
 eeb58e81d3eec22fe6967fb3615233dd *src/allClasses4.cc
 b8cab89b3a813d8308a1a037886fc841 *src/myData4.cc
-e8174077b89102f445605b738b5ad23d *src/myDerivs4.cc
+31cb2ca90af8e457a4951ea6c884a987 *src/myDerivs4.cc
 b15a09d342b21adbf509bbe4d3a10523 *src/myFits4.cc
 a9d50e5a2dd95cd5ff73199bc1151fc4 *src/myOptCont4.cc
-6ddc9bce577f0ab91e9a1e27889aa66a *src/myParms4.cc
+a7e752dc0dcbe40f062791ac63f31acf *src/myParms4.cc
 dac892f9fe2f6da8b91227de0f8e9706 *src/rcp4.cc
 7f3f643645496250514791e92105f4a1 *src/rcp4.h
 d9e37ca1e840c5eae8cbb9a34e5fca87 *src/rcpPred4.cc

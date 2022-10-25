@@ -983,7 +983,7 @@ function (x, ..., type="RQR", nsim = 100, alpha.conf = c(0.9, 0.95, 0.99), quiet
     allResids <- matrix(NA, nrow = x$n, ncol = nsim)
     X <- x$titbits$X
     p.x <- ncol( X)
-    if( class( x$titbits$form.spp)=="formula"){
+    if( inherits( x$titbits$form.spp, "formula")){
       form.W <- x$titbits$form.spp
       W <- x$titbits$W
       p.w <- ncol( W)
@@ -1175,7 +1175,7 @@ function (object, object2 = NULL, ..., newdata = NULL, nboot = 0,
 {
     if (is.null(newdata)) {
         X <- object$titbits$X
-        if (class(object$titbits$form.spp) == "formula") {
+        if ( inherits(object$titbits$form.spp,"formula")) {
             form.W <- object$titbits$form.spp
             W <- object$titbits$W
             p.w <- ncol(W)
@@ -1191,7 +1191,7 @@ function (object, object2 = NULL, ..., newdata = NULL, nboot = 0,
         if (length(form.X) == 3) 
             form.X[[2]] <- NULL
         X <- model.matrix(form.X, model.frame(form.X, data = as.data.frame(newdata)))
-        if (class(object$titbits$form.spp) == "formula") {
+        if (inherits(object$titbits$form.spp, "formula")) {
             W <- model.matrix(object$titbits$form.spp, model.frame(object$titbits$form.spp, 
                 data = as.data.frame(newdata)))
             p.w <- ncol(W)
@@ -1236,7 +1236,7 @@ function (object, object2 = NULL, ..., newdata = NULL, nboot = 0,
     tauIn <- tauIn[-1]
     betaIn <- c(NA, as.numeric(object$coef$beta))
     betaIn <- betaIn[-1]
-    if (class(object$titbits$form.spp) == "formula") {
+    if (inherits(object$titbits$form.spp,"formula")) {
         gammaIn <- c(NA, as.numeric(object$coef$gamma))
         gammaIn <- gammaIn[-1]
     }
@@ -2119,7 +2119,7 @@ function (object, ..., object2=NULL, method = "FiniteDifference", nboot = 1000, 
     mc.cores <- 1
   X <- object$titbits$X
   p.x <- ncol( X)
-  if( class( object$titbits$form.spp)=="formula"){
+  if( inherits( object$titbits$form.spp, "formula")){
     form.W <- object$titbits$form.spp
     W <- object$titbits$W
     p.w <- ncol( W)
